@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pesa Poa — Akiba (Savings)</title>
+<style>
+  :root{
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#16261C; --ink-soft:#4C5A50; --line:#E7DECB;
+    --green:#0E9E5B; --green-deep:#0A6F41; --green-tint:#E4F6EC;
+    --coral:#E24A33; --coral-tint:#FBE6E1; --yellow:#FFC22E; --teal:#0E7C86; --teal-deep:#0A5C64;
+    --shadow:0 6px 0 rgba(20,38,28,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);-webkit-text-size-adjust:100%;line-height:1.45}
+  .wrap{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+
+  .hud{position:sticky;top:0;z-index:10;background:var(--teal-deep);color:#fff;padding:8px 12px 10px;box-shadow:0 3px 10px rgba(0,0,0,.18)}
+  .hud-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .hud-brand{font-weight:900;letter-spacing:.01em;font-size:15px}
+  .hud-brand b{color:var(--yellow)}
+  .langbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;font:inherit;font-weight:800;font-size:11px;letter-spacing:.04em;padding:5px 11px;cursor:pointer}
+  .langbtn:active{transform:translateY(1px)}
+  .hud-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .hud-item{text-align:center;line-height:1.1}
+  .hud-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+  .hud-val{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+  .hud-item.debt .hud-val{color:#FFD7CE}
+
+  .progress{height:6px;background:rgba(255,255,255,.25);margin:8px -12px -10px}
+  .progress-fill{height:100%;background:var(--yellow);width:0;transition:width .4s ease}
+
+  .stage{flex:1;padding:18px 16px 28px;display:flex;flex-direction:column}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:0 0 8px}
+  .scene{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+  .scene h2{margin:0 0 10px;font-size:21px;line-height:1.25}
+  .scene p{margin:0 0 14px;color:var(--ink-soft);font-size:16px}
+
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{width:100%;text-align:left;cursor:pointer;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px;font:inherit;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:12px;transition:transform .08s ease,border-color .15s ease,background .15s ease}
+  .opt:hover{border-color:var(--teal);background:#FCFFFD}
+  .opt:active{transform:translateY(2px)}
+  .opt:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .opt-main{font-weight:700;font-size:16px}
+  .opt-sub{font-size:13px;color:var(--ink-soft);margin-top:2px;font-weight:500}
+  .opt-cost{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .opt-cost.spend{color:var(--coral)}
+  .opt-cost.earn{color:var(--green)}
+  .opt-cost.free{color:var(--ink-soft)}
+
+  .tool{margin-top:6px}
+  .tool-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .tool-big{font-size:34px;font-weight:900;color:var(--teal-deep);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--teal);height:34px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .stat{background:var(--green-tint);border-radius:12px;padding:10px;text-align:center}
+  .stat .n{font-size:20px;font-weight:900;color:var(--green-deep);font-variant-numeric:tabular-nums}
+  .stat .l{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
+  .verdict{border-radius:16px;padding:16px;border:2px solid;animation:rise .35s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.verdict{animation:none}}
+  .verdict.good{background:var(--green-tint);border-color:var(--green)}
+  .verdict.bad{background:var(--coral-tint);border-color:var(--coral)}
+  .verdict.neutral{background:#FFF6DC;border-color:var(--yellow)}
+  .verdict h3{margin:0 0 6px;font-size:17px}
+  .verdict .later{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;opacity:.7;margin:10px 0 2px}
+  .verdict p{margin:0 0 8px;font-size:15px;color:var(--ink)}
+  .lesson{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,.6);border-radius:10px;padding:10px;margin-top:6px;font-size:14px}
+  .lesson b{color:var(--teal-deep)}
+  .delta-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .tag{font-size:13px;font-weight:800;padding:5px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
+  .tag.spend{background:var(--coral);color:#fff}
+  .tag.earn{background:var(--green);color:#fff}
+  .tag.save{background:var(--teal);color:#fff}
+  .tag.pts{background:var(--yellow);color:#3a2c00}
+
+  .btn{display:block;width:100%;margin-top:16px;cursor:pointer;background:var(--teal);color:#fff;border:none;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:17px;box-shadow:0 5px 0 var(--teal-deep);transition:transform .08s ease}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--teal-deep)}
+  .btn:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+  .btn.ghost{background:#fff;color:var(--teal-deep);border:2px solid var(--teal);box-shadow:0 5px 0 var(--green-tint)}
+
+  .center{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px 8px}
+  .startbar{display:flex;justify-content:flex-end;padding:10px 12px 0}
+  .logo{font-size:40px;font-weight:900;letter-spacing:-.02em;color:var(--teal-deep);margin:0}
+  .logo span{color:var(--yellow);-webkit-text-stroke:1px var(--teal-deep)}
+  .module{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--teal);padding:4px 12px;border-radius:999px;margin:10px 0 0}
+  .tagline{color:var(--ink-soft);font-size:16px;margin:10px 0 22px}
+  .namebox{width:100%;padding:14px;font:inherit;font-size:16px;border:2px solid var(--line);border-radius:14px;text-align:center;margin-bottom:6px}
+  .namebox:focus{outline:none;border-color:var(--teal)}
+  .end-score{font-size:56px;font-weight:900;color:var(--teal-deep);line-height:1;margin:4px 0;font-variant-numeric:tabular-nums}
+  .badge{display:inline-block;background:var(--yellow);color:#3a2c00;font-weight:800;padding:8px 16px;border-radius:999px;margin-bottom:14px}
+  .recap{text-align:left;background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
+  .recap h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--teal)}
+  .recap li{margin-bottom:7px;font-size:14px;color:var(--ink-soft)}
+  .money-line{display:flex;justify-content:space-between;font-size:15px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .money-line:last-child{border:none;font-weight:800}
+  .foot{text-align:center;font-size:12px;color:var(--ink-soft);padding:14px}
+  .langbtn.light{background:#fff;border:2px solid var(--teal);color:var(--teal-deep)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============================================================
+   PESA POA — AKIBA (Savings)
+   Offline financial-literacy game for Kenyan secondary students.
+   Same engine as budget.html. Single file, works offline on
+   phone and PC. English / Kiswahili.
+
+   >>> TO EDIT / TRANSLATE: every text is {en:"...", sw:"..."}.
+       Money is in Kenyan Shillings (KSh). Tune numbers freely.
+       Add a scenario by copying one block in the POOL array.
+       Each play picks 9 scenarios (3 anchors + 6 random) so
+       replays differ. Mark anchor:true to always include one.
+   ============================================================ */
+
+const START_MONEY = 5000;
+const ROUNDS = 9;
+
+/* ---------- UI strings ---------- */
+const L = {
+ en:{
+  tagline:"A game about building a buffer.<br>Small choices. Real safety net. See what sticks.",
+  namePh:"Type your name (optional)", start:"Start saving →",
+  best:"Best score on this device:", startMoney:"You start with {m} for the month, plus a savings goal in mind.",
+  hudMoney:"Money", hudDebt:"In debt", hudSaved:"Saved", hudPts:"Akili pts",
+  free:"Free", next:"Next →", seeResults:"See my results →",
+  vGood:"Good thinking.", vBad:"Ouch — that one hurt.", vNeutral:"Okay — let's look closer.",
+  lesson:"Lesson:", tagSaved:"Saved {m}", tagUsed:"Used {m} from savings", tagAkili:"+{p} Akili", tagProfit:"Net result {m}",
+  perDay:"Per day", inWeek:"in a week", inMonth:"in a month", inYear:"in a year",
+  sliderBtn:"Got it — that's powerful →", sliderLater:"The year ahead", sliderHead:"Small money, big result",
+  sliderBody:"Just KSh {d} a day becomes {y} in a year — without earning one extra shilling. That's fees, stock, or an emergency covered without borrowing.",
+  guessLabel:"KSh {n}", revealRight:"Correct! The real number is {p}.", revealWrong:"Not quite — the real number is smaller than most people guess.",
+  revealLater:"The honest maths", revealYouSaw:"You saw it.", revealMost:"Most people guess higher.",
+  revealIntro:"Here is what really happened to the money:", realProfit:"NET result",
+  endEyebrow:"End of the month", scoreNamed:"{name}, your Akili score", scoreUnnamed:"Your Akili score",
+  moneyLeft:"Money left", savedUp:"Saved up", totalWorth:"Total worth", remember:"Three things to remember",
+  r1:"Money set aside <b>before</b> you can spend it is money that actually gets saved.",
+  r2:"A place that's hard to reach protects your savings from you — and from everyone else.",
+  r3:"Windfalls and small daily amounts are the easiest money to save. You never counted on it anyway.",
+  playAgain:"Play again →", backStart:"Back to start",
+  badgeDebt:"Keep practising 💪", msgDebt:"You ended the month short. Replay and watch what each choice does to your buffer — you'll spot the leaks.",
+  badgePro:"Akiba Pro 🏆", msgPro:"Excellent. You protect your savings, you use them on purpose, and you make small money grow.",
+  badgeSaver:"Steady Saver ⭐", msgSaver:"Strong month. A few choices could go even further — try again and beat your score.",
+  badgeGrow:"Building the habit 🌱", msgGrow:"A steady month. Look for the choice that protects your buffer each time and your score will climb."
+ },
+ sw:{
+  tagline:"Mchezo kuhusu kujenga akiba.<br>Maamuzi madogo. Kinga halisi. Ona kinachobaki.",
+  namePh:"Andika jina lako (si lazima)", start:"Anza kuweka akiba →",
+  best:"Alama bora kwenye kifaa hiki:", startMoney:"Unaanza na {m} kwa mwezi, ukiwa na lengo la akiba akilini.",
+  hudMoney:"Pesa", hudDebt:"Una deni", hudSaved:"Akiba", hudPts:"Akili",
+  free:"Bure", next:"Endelea →", seeResults:"Ona matokeo →",
+  vGood:"Wazo zuri.", vBad:"Aa — hiyo imeumiza.", vNeutral:"Sawa — tuangalie kwa karibu.",
+  lesson:"Funzo:", tagSaved:"Akiba {m}", tagUsed:"Imetumia {m} kutoka akiba", tagAkili:"+{p} Akili", tagProfit:"Matokeo {m}",
+  perDay:"Kwa siku", inWeek:"kwa wiki", inMonth:"kwa mwezi", inYear:"kwa mwaka",
+  sliderBtn:"Nimeelewa — hiyo ina nguvu →", sliderLater:"Mwaka ujao", sliderHead:"Pesa kidogo, matokeo makubwa",
+  sliderBody:"KSh {d} tu kwa siku inakuwa {y} kwa mwaka — bila kupata shilingi moja ya ziada. Hiyo ni ada, bidhaa, au dharura iliyolipwa bila kukopa.",
+  guessLabel:"KSh {n}", revealRight:"Sahihi! Namba halisi ni {p}.", revealWrong:"Sio sawa kabisa — namba halisi ni ndogo kuliko watu wengi hukisia.",
+  revealLater:"Hesabu ya kweli", revealYouSaw:"Umeiona.", revealMost:"Watu wengi hukisia zaidi.",
+  revealIntro:"Hiki ndicho kilichotokea kwa pesa:", realProfit:"MATOKEO halisi",
+  endEyebrow:"Mwisho wa mwezi", scoreNamed:"{name}, alama yako ya Akili", scoreUnnamed:"Alama yako ya Akili",
+  moneyLeft:"Pesa iliyobaki", savedUp:"Akiba", totalWorth:"Thamani jumla", remember:"Mambo matatu ya kukumbuka",
+  r1:"Pesa iliyotengwa <b>kabla</b> hujaitumia ndiyo pesa inayowekwa akiba kweli.",
+  r2:"Mahali pagumu kufikia hulinda akiba yako dhidi yako — na dhidi ya wengine wote.",
+  r3:"Pesa za ziada na kiasi kidogo cha kila siku ndizo rahisi kuweka akiba. Haukuwahi kuzitegemea hata kidogo.",
+  playAgain:"Cheza tena →", backStart:"Rudi mwanzo",
+  badgeDebt:"Endelea kujizoeza 💪", msgDebt:"Umemaliza mwezi ukiwa na upungufu. Cheza tena uone kila chaguo linavyoathiri akiba yako — utagundua uvujaji.",
+  badgePro:"Akiba Pro 🏆", msgPro:"Vizuri sana. Unalinda akiba yako, unaitumia kwa makusudi, na unafanya pesa kidogo ikue.",
+  badgeSaver:"Mwekaji Akiba Imara ⭐", msgSaver:"Mwezi mzuri. Baadhi ya maamuzi yangeenda mbali zaidi — jaribu tena uvunje rekodi yako.",
+  badgeGrow:"Unajenga mazoea 🌱", msgGrow:"Mwezi wa kawaida. Tafuta chaguo linalolinda akiba yako kila wakati na alama zako zitapanda."
+ }
+};
+
+/* ---------- Scenario pool ---------- */
+const POOL = [
+ { id:"emergency", anchor:true, order:10, type:"choice",
+   eyebrow:{en:"The emergency",sw:"Dharura"},
+   title:{en:"Your younger sibling gets sick. The clinic wants 800 KSh today.",sw:"Mdogo wako anaugua. Kliniki inataka KSh 800 leo."},
+   text:{en:"You have savings, but they were 'for something else'. What do you do?",sw:"Una akiba, lakini ilikuwa 'kwa ajili ya kitu kingine'. Utafanya nini?"},
+   options:[
+     {main:{en:"Use money from your savings",sw:"Tumia pesa kutoka akibani"}, sub:{en:"That's what a buffer is for",sw:"Hiyo ndiyo kazi ya akiba"}, cost:0, savings:-800, points:25, verdict:"good",
+      later:{en:"That evening",sw:"Jioni hiyo"},
+      result:{en:"The clinic is paid, no debt, no stress. Your savings did exactly the job you built them for.",sw:"Kliniki imelipwa, hakuna deni, hakuna msongo. Akiba yako imefanya kazi uliyoijengea."},
+      lesson:{en:"Savings exist for real emergencies. Using them for their purpose is smart, not a failure.",sw:"Akiba ipo kwa ajili ya dharura halisi. Kuitumia kwa kusudi lake ni busara, si kushindwa."}},
+     {main:{en:"Take a quick mobile loan instead",sw:"Chukua mkopo wa haraka wa simu badala yake"}, sub:{en:"Borrow 800, repay 920 next week",sw:"Kopa 800, lipa 920 wiki ijayo"}, cost:0, money:-920, debt:true, points:0, verdict:"bad",
+      later:{en:"Next week",sw:"Wiki ijayo"},
+      result:{en:"Repaying 920 for an 800 problem — 120 extra for speed, and next week's budget is tighter for it.",sw:"Kulipa 920 kwa tatizo la 800 — ziada ya 120 kwa haraka, na bajeti ya wiki ijayo inabana zaidi."},
+      lesson:{en:"Emergency loans are fast but expensive. A savings buffer is the cheapest emergency loan you'll ever get.",sw:"Mikopo ya dharura ni ya haraka lakini ghali. Akiba ndicho kikopo cha dharura kilicho nafuu zaidi utakachopata."}},
+     {main:{en:"Ask a neighbour for a free loan",sw:"Omba jirani mkopo wa bure"}, sub:{en:"No interest, but now you owe a favour",sw:"Hakuna riba, lakini sasa unadaiwa fadhila"}, cost:0, money:0, points:10, verdict:"neutral",
+      later:{en:"Next week",sw:"Wiki ijayo"},
+      result:{en:"It cost nothing in shillings, but you now owe a favour — and favours get called in at inconvenient times.",sw:"Haikugharimu shilingi, lakini sasa unadaiwa fadhila — na fadhila hudaiwa nyakati zisizofaa."},
+      lesson:{en:"Free help isn't always free. Relying only on others' goodwill is not a real safety net.",sw:"Msaada wa bure si bure kila wakati. Kutegemea wema wa wengine tu si kinga halisi."}}
+   ]},
+
+ { id:"merrygoround", anchor:true, order:50, type:"reveal",
+   eyebrow:{en:"The chama round",sw:"Zamu ya chama"},
+   title:{en:"You join a chama: 200 KSh/week for 10 weeks. You receive the whole pot in week 3.",sw:"Unajiunga na chama: KSh 200/wiki kwa wiki 10. Unapokea mfuko wote wiki ya 3."},
+   text:{en:`"I got 2,000 free in week 3!" — is that right? Guess your REAL net result after all 10 weeks:`,sw:`"Nimepata 2,000 bure wiki ya 3!" — ni kweli? Kisia matokeo yako HALISI baada ya wiki zote 10:`},
+   guesses:[1800,0,-200], correctIndex:1,
+   breakdown:[
+     {label:{en:"Lump sum received (week 3)",sw:"Kiasi kikubwa kilichopokelewa (wiki 3)"}, val:2000},
+     {label:{en:"Total contributed over 10 weeks",sw:"Jumla iliyowekwa kwa wiki 10"}, val:-2000}
+   ],
+   realProfit:0, moneyOnRun:0, points:25,
+   lesson:{en:"A rotating chama isn't free money — you pay in exactly what you take out. What you gain is early access to a lump sum, and the discipline to keep paying after you've already had your turn.",sw:"Chama cha zamu si pesa bure — unaweka sawasawa na unachotoa. Unachopata ni kupata mkupuo mapema, na nidhamu ya kuendelea kulipa hata baada ya zamu yako kupita."}},
+
+ { id:"coinjar", anchor:true, order:80, type:"slider",
+   eyebrow:{en:"The coin jar",sw:"Kopo la sarafu"},
+   title:{en:"What if you dropped a small coin in a jar every single day?",sw:"Vipi ukiweka sarafu ndogo kwenye kopo kila siku?"},
+   text:{en:"Slide to choose how much per day. Watch what it becomes in a year.",sw:"Sogeza ili kuchagua kiasi kwa siku. Tazama kinavyokuwa kwa mwaka."},
+   min:10, max:100, step:10, start:50, points:20,
+   lesson:{en:"Small money, repeated, becomes real money. You don't need to be rich to save — you need to be regular.",sw:"Pesa kidogo, ikirudiwa, inakuwa pesa kubwa. Huhitaji kuwa tajiri ili kuweka akiba — unahitaji kuwa wa kawaida."}},
+
+ { id:"keepit", order:15, type:"choice",
+   eyebrow:{en:"Where to keep it",sw:"Wapi pa kuiweka"},
+   title:{en:"You have 1,000 KSh you don't need this week.",sw:"Una KSh 1,000 usizohitaji wiki hii."},
+   text:{en:"Where do you put it?",sw:"Utaiweka wapi?"},
+   options:[
+     {main:{en:"Under the mattress at home",sw:"Chini ya godoro nyumbani"}, sub:{en:"Easy to reach anytime",sw:"Rahisi kufikia wakati wowote"}, cost:0, savings:300, points:0, verdict:"bad",
+      later:{en:"A few weeks later",sw:"Wiki chache baadaye"},
+      result:{en:"Easy to reach for you — and for every small temptation and 'just this once'. Only 300 of the 1,000 survived.",sw:"Rahisi kufikia kwako — na kwa kila jaribu dogo na 'mara hii tu'. 300 tu kati ya 1,000 ilibaki."},
+      lesson:{en:"Loose cash at home is at war with your own willpower every single day. It usually loses.",sw:"Pesa taslimu nyumbani inapigana na utashi wako kila siku. Mara nyingi inashindwa."}},
+     {main:{en:"Lock it in mobile savings (30-day lock)",sw:"Fungia kwenye akiba ya simu (siku 30)"}, sub:{en:"Can't touch it for 30 days",sw:"Huwezi kuigusa kwa siku 30"}, cost:0, savings:1000, points:25, verdict:"good",
+      later:{en:"A few weeks later",sw:"Wiki chache baadaye"},
+      result:{en:"Locked away, it survived untouched. When you checked, it was still 1,000 whole.",sw:"Ikiwa imefungwa, ilibaki bila kuguswa. Ulipoangalia, ilikuwa 1,000 kamili."},
+      lesson:{en:"Friction is a feature. Making money hard to reach protects it from you.",sw:"Ugumu wa kufikia ni faida. Kufanya pesa ngumu kufikia inailinda dhidi yako."}},
+     {main:{en:"Give it to a trusted relative to hold",sw:"Mpe ndugu unayemwamini aihifadhi"}, sub:{en:"They keep it safe for you",sw:"Wanaikuhifadhia salama"}, cost:0, savings:700, points:10, verdict:"neutral",
+      later:{en:"A few weeks later",sw:"Wiki chache baadaye"},
+      result:{en:"When you asked for it back, they'd 'borrowed' 300 for their own need. You got 700 back, eventually.",sw:"Ulipoomba irudishwe, walikuwa wame'kopa' 300 kwa mahitaji yao. Ulipata 700 tu, hatimaye."},
+      lesson:{en:"Even trusted people can dip into money that isn't locked away. If it's still reachable, it's still at risk.",sw:"Hata watu wa kuaminika wanaweza kutumia pesa isiyofungwa. Ikiwa bado inafikika, bado iko hatarini."}}
+   ]},
+
+ { id:"windfall", order:20, type:"choice",
+   eyebrow:{en:"The gift",sw:"Zawadi"},
+   title:{en:"A relative visiting from Nairobi gives you an unexpected 1,000 KSh.",sw:"Ndugu anayetembelea kutoka Nairobi anakupa KSh 1,000 bila kutarajia."},
+   text:{en:"What do you do with it?",sw:"Utaifanyia nini?"},
+   options:[
+     {main:{en:"Spend it all on something fun now",sw:"Itumie yote kwa kitu cha starehe sasa"}, sub:{en:"You never had it anyway",sw:"Haukuwa nayo hata hivyo"}, cost:0, money:0, points:0, verdict:"bad",
+      later:{en:"By evening",sw:"Kufikia jioni"},
+      result:{en:"The treat was nice for an afternoon. By evening, all 1,000 was gone and nothing had changed for the month ahead.",sw:"Starehe ilikuwa nzuri kwa mchana. Kufikia jioni, 1,000 yote ilikuwa imekwisha na hakuna kilichobadilika kwa mwezi ujao."},
+      lesson:{en:"Unplanned money spent without a plan disappears exactly as fast as any other money.",sw:"Pesa isiyopangwa inayotumika bila mpango hutoweka haraka kama pesa nyingine yoyote."}},
+     {main:{en:"Save half, treat yourself with half",sw:"Weka nusu akiba, jinunulie starehe kwa nusu"}, sub:{en:"500 saved, 500 enjoyed",sw:"500 akiba, 500 starehe"}, cost:0, money:500, savings:500, points:15, verdict:"good",
+      later:{en:"By evening",sw:"Kufikia jioni"},
+      result:{en:"You enjoyed a treat AND kept half. A small win with no regret.",sw:"Ulifurahia starehe NA ukabaki na nusu. Ushindi mdogo bila majuto."},
+      lesson:{en:"A windfall is a chance to both enjoy and build — you don't have to choose only one.",sw:"Pesa ya ziada ni nafasi ya kufurahia na kujenga — si lazima uchague moja tu."}},
+     {main:{en:"Save the entire 1,000",sw:"Weka 1,000 yote akiba"}, sub:{en:"You weren't counting on it",sw:"Haukuwa unaitegemea"}, cost:0, money:1000, savings:1000, points:25, verdict:"good",
+      later:{en:"By evening",sw:"Kufikia jioni"},
+      result:{en:"The whole gift went straight to your buffer. Next time an emergency comes, you'll be more ready.",sw:"Zawadi yote ilienda moja kwa moja kwenye akiba. Dharura ijayo, utakuwa tayari zaidi."},
+      lesson:{en:"Windfalls are the easiest money to save — you never budgeted for it, so you won't miss it.",sw:"Pesa za ziada ndizo rahisi kuweka akiba — haukuzipangia, kwa hivyo hutazikosa."}}
+   ]},
+
+ { id:"missedchama", order:25, type:"choice",
+   eyebrow:{en:"Missed contribution",sw:"Mchango uliokosa"},
+   title:{en:"You don't have your full 200 KSh chama contribution this week.",sw:"Huna mchango wako kamili wa KSh 200 wa chama wiki hii."},
+   text:{en:"What do you do?",sw:"Utafanya nini?"},
+   options:[
+     {main:{en:"Skip this week, pay double next week",sw:"Ruka wiki hii, lipa mara mbili wiki ijayo"}, sub:{en:"The group allows it",sw:"Kikundi kinaruhusu"}, cost:0, money:0, points:0, verdict:"neutral",
+      later:{en:"Next week",sw:"Wiki ijayo"},
+      result:{en:"The group accepted it, but next week you owe 400 — a tighter squeeze right when you can least afford it.",sw:"Kikundi kilikubali, lakini wiki ijayo unadaiwa 400 — ubano mkubwa wakati usioweza kumudu."},
+      lesson:{en:"Missing a contribution doesn't erase it — it just moves the pain to a week that's already busy.",sw:"Kukosa mchango hakuufutii — kunahamisha maumivu kwenda wiki iliyo na shughuli nyingi tayari."}},
+     {main:{en:"Borrow 100 from a friend to stay current",sw:"Kopa 100 kwa rafiki ili ubaki sasa"}, sub:{en:"A small, fast-repaid favour",sw:"Fadhila ndogo, itakayolipwa haraka"}, cost:100, money:-100, points:15, verdict:"good",
+      later:{en:"Next week",sw:"Wiki ijayo"},
+      result:{en:"Staying current kept your place in the rotation and cost only a small, easily repaid favour.",sw:"Kubaki sasa kulihifadhi nafasi yako kwenye zamu na kugharimu fadhila ndogo, iliyolipwa kwa urahisi."},
+      lesson:{en:"Sometimes a tiny, fast-repaid borrow is cheaper than falling behind on a bigger commitment.",sw:"Wakati mwingine mkopo mdogo, unaolipwa haraka, ni nafuu kuliko kuchelewa kwenye ahadi kubwa."}},
+     {main:{en:"Quit the chama",sw:"Acha chama"}, sub:{en:"One less thing to worry about",sw:"Jambo moja pungufu la kuwaza"}, cost:0, money:0, points:0, verdict:"bad",
+      later:{en:"Next week",sw:"Wiki ijayo"},
+      result:{en:"You avoided this week's pinch, but you also lost your spot and the discipline the group gave you.",sw:"Uliepuka ubano wa wiki hii, lakini pia ulipoteza nafasi yako na nidhamu iliyotolewa na kikundi."},
+      lesson:{en:"Quitting a savings structure over one hard week often costs more than the week itself would have.",sw:"Kuacha mfumo wa akiba kwa wiki moja ngumu mara nyingi kunagharimu zaidi ya wiki yenyewe."}}
+   ]},
+
+ { id:"goat", order:30, type:"choice",
+   eyebrow:{en:"The young goat",sw:"Mbuzi mdogo"},
+   title:{en:"You've been raising a young goat as savings. A buyer offers 1,500 KSh now — it's not fully grown.",sw:"Umekuwa ukilea mbuzi mdogo kama akiba. Mnunuzi anatoa KSh 1,500 sasa — bado hajakomaa."},
+   text:{en:"Sell now, or wait?",sw:"Uuze sasa, au usubiri?"},
+   options:[
+     {main:{en:"Sell now for 1,500",sw:"Uza sasa kwa 1,500"}, sub:{en:"Cash in hand today",sw:"Pesa mkononi leo"}, cost:0, money:1500, savings:1500, points:10, verdict:"neutral",
+      later:{en:"Two months later",sw:"Miezi miwili baadaye"},
+      result:{en:"Fair cash today, but a grown goat two months from now would have fetched nearer 2,500.",sw:"Pesa nzuri leo, lakini mbuzi aliyekomaa baada ya miezi miwili angeuzwa karibu 2,500."},
+      lesson:{en:"Selling an appreciating asset early locks in the smaller price.",sw:"Kuuza mali inayoongezeka thamani mapema kunafunga bei ndogo."}},
+     {main:{en:"Wait 2 months, sell it grown",sw:"Subiri miezi 2, uuze akiwa amekomaa"}, sub:{en:"Expected ~2,500, but there's risk",sw:"Inatarajiwa ~2,500, lakini kuna hatari"}, cost:0, money:2500, savings:2500, points:25, verdict:"good",
+      later:{en:"Two months later",sw:"Miezi miwili baadaye"},
+      result:{en:"Patience paid — literally. 1,000 more for the same goat, just by waiting for it to mature.",sw:"Uvumilivu ulilipa — halisi. 1,000 zaidi kwa mbuzi yule yule, kwa kusubiri tu akomae."},
+      lesson:{en:"Some savings grow simply by being left alone — but only if you can afford the wait and the risk of loss along the way.",sw:"Baadhi ya akiba hukua kwa kuachwa tu — lakini tu kama unaweza kumudu kusubiri na hatari ya kupoteza njiani."}}
+   ]},
+
+ { id:"bankinterest", order:35, type:"reveal",
+   eyebrow:{en:"The bank account",sw:"Akaunti ya benki"},
+   title:{en:"You deposit 5,000 KSh in a bank savings account for one year.",sw:"Unaweka KSh 5,000 kwenye akaunti ya akiba ya benki kwa mwaka mmoja."},
+   text:{en:"Guess how much interest you'll really earn in a year:",sw:"Kisia utapata riba kiasi gani kweli kwa mwaka:"},
+   guesses:[900,150,20], correctIndex:1,
+   breakdown:[
+     {label:{en:"Amount deposited",sw:"Kiasi kilichowekwa"}, val:5000},
+     {label:{en:"Interest earned (~3% a year)",sw:"Riba iliyopatikana (~3% kwa mwaka)"}, val:150},
+     {label:{en:"Account/ledger fees",sw:"Ada za akaunti"}, val:-30}
+   ],
+   realProfit:120, moneyOnRun:120, points:20,
+   lesson:{en:"Formal savings pay little interest, but they're safe from theft, temptation, and 'borrowing' relatives — that safety has value even when the number is small.",sw:"Akiba rasmi hulipa riba kidogo, lakini ni salama dhidi ya wizi, jaribu, na ndugu 'wanaokopa' — usalama huo una thamani hata namba ikiwa ndogo."}},
+
+ { id:"payfirst", order:40, type:"choice",
+   eyebrow:{en:"Payday",sw:"Siku ya malipo"},
+   title:{en:"Payday. You have 4,000 KSh for the week's needs and wants.",sw:"Siku ya malipo. Una KSh 4,000 kwa mahitaji na matakwa ya wiki."},
+   text:{en:"What order do you handle your money?",sw:"Utashughulikia pesa zako kwa mpangilio gani?"},
+   options:[
+     {main:{en:"Save 400 first, spend the rest as it comes",sw:"Weka akiba 400 kwanza, tumia iliyobaki inavyokuja"}, sub:{en:"Pay yourself first",sw:"Jilipe kwanza"}, cost:0, savings:400, points:25, verdict:"good",
+      later:{en:"By Friday",sw:"Kufikia Ijumaa"},
+      result:{en:"The 400 was gone from view before you could spend it. By week's end, needs were covered and the saving was untouched.",sw:"400 ilitoweka mbele ya macho kabla hujaitumia. Kufikia mwisho wa wiki, mahitaji yalikamilika na akiba haikuguswa."},
+      lesson:{en:"Saving first, before spending, means saving actually happens. Saving 'whatever's left' usually means saving nothing.",sw:"Kuweka akiba kwanza, kabla ya kutumia, kunamaanisha akiba inatokea kweli. Kuweka 'kilichobaki' mara nyingi kunamaanisha hakuna kinachobaki."}},
+     {main:{en:"Spend on needs and wants first, save what's left",sw:"Tumia kwa mahitaji na matakwa kwanza, weka akiba iliyobaki"}, sub:{en:"See what remains at the end",sw:"Ona kinachobaki mwishoni"}, cost:0, money:0, points:0, verdict:"bad",
+      later:{en:"By Friday",sw:"Kufikia Ijumaa"},
+      result:{en:"By the time Friday came, there was nothing left to set aside — as usual.",sw:"Kufikia Ijumaa, hakuna kilichobaki kutengwa — kama kawaida."},
+      lesson:{en:"'Whatever's left' is rarely anything. Spending always expands to fill the money available.",sw:"'Kilichobaki' mara chache huwa kitu. Matumizi hupanuka kujaza pesa iliyopo kila wakati."}}
+   ]},
+
+ { id:"twogoals", order:45, type:"choice",
+   eyebrow:{en:"Two goals",sw:"Malengo mawili"},
+   title:{en:"You have 300 KSh spare. New school shoes are needed in 2 months. A friend's trip to Kisumu is next week.",sw:"Una KSh 300 za ziada. Viatu vipya vya shule vinahitajika baada ya miezi 2. Safari ya rafiki Kisumu ni wiki ijayo."},
+   text:{en:"Where does the 300 go?",sw:"300 zitaenda wapi?"},
+   options:[
+     {main:{en:"Toward the shoes fund",sw:"Kwa akiba ya viatu"}, sub:{en:"A real deadline, 2 months out",sw:"Muda halisi, miezi 2"}, cost:0, savings:300, points:20, verdict:"good",
+      later:{en:"Two months later",sw:"Miezi miwili baadaye"},
+      result:{en:"The shoes fund filled up steadily. The trip can happen another time.",sw:"Akiba ya viatu ilijaa taratibu. Safari inaweza kufanyika wakati mwingine."},
+      lesson:{en:"A needed goal with a deadline should usually beat an optional one without a plan.",sw:"Lengo la lazima lenye muda kawaida linapaswa kushinda la hiari lisilo na mpango."}},
+     {main:{en:"Toward the Kisumu trip",sw:"Kwa safari ya Kisumu"}, sub:{en:"Fun now, shoes can wait",sw:"Starehe sasa, viatu vinaweza kusubiri"}, cost:300, money:-300, points:0, verdict:"neutral",
+      later:{en:"Two months later",sw:"Miezi miwili baadaye"},
+      result:{en:"The trip was fun. But the shoe fund didn't move, and the deadline is getting closer.",sw:"Safari ilikuwa nzuri. Lakini akiba ya viatu haikusonga, na muda unakaribia."},
+      lesson:{en:"Fun spending isn't wrong — but when it competes with a real deadline, know which one you're choosing.",sw:"Matumizi ya starehe si makosa — lakini yanapopingana na muda halisi, jua unachagua kipi."}},
+     {main:{en:"Split it, 150 each",sw:"Gawanya, 150 kila moja"}, sub:{en:"A bit of both",sw:"Kidogo cha vyote viwili"}, cost:150, money:-150, savings:150, points:15, verdict:"good",
+      later:{en:"Two months later",sw:"Miezi miwili baadaye"},
+      result:{en:"Some progress on the shoes, and a smaller version of the trip. Both goals moved a little.",sw:"Maendeleo kidogo kwa viatu, na safari ndogo zaidi. Malengo yote mawili yalisonga kidogo."},
+      lesson:{en:"Splitting isn't always optimal, but it's a reasonable way to honour two real goals at once.",sw:"Kugawanya si bora kila wakati, lakini ni njia nzuri ya kuheshimu malengo mawili halisi kwa wakati mmoja."}}
+   ]},
+
+ { id:"harambee", order:55, type:"choice",
+   eyebrow:{en:"The harambee",sw:"Harambee"},
+   title:{en:"A neighbour's harambee for a funeral asks you for 200 KSh. You have 250 KSh to your name this week.",sw:"Harambee ya jirani kwa mazishi inakuomba KSh 200. Una KSh 250 tu wiki hii."},
+   text:{en:"What do you give?",sw:"Utatoa nini?"},
+   options:[
+     {main:{en:"Give the full 200 asked",sw:"Toa 200 yote iliyoombwa"}, sub:{en:"Leaves you with just 50",sw:"Inakuachia 50 tu"}, cost:200, money:-200, points:0, verdict:"neutral",
+      later:{en:"Later that week",sw:"Baadaye wiki hiyo"},
+      result:{en:"You honoured the request, but you're left with just 50 for the rest of the week — no buffer if anything else comes up.",sw:"Uliheshimu ombi, lakini umebaki na 50 tu kwa wiki iliyobaki — hakuna kinga kama kitu kingine kitatokea."},
+      lesson:{en:"Generosity matters, but giving past what you can afford turns a kind act into your own emergency.",sw:"Ukarimu ni muhimu, lakini kutoa zaidi ya unavyoweza kunageuza tendo jema kuwa dharura yako mwenyewe."}},
+     {main:{en:"Give what you can afford, e.g. 50",sw:"Toa unachoweza, mfano 50"}, sub:{en:"An honest amount",sw:"Kiasi cha kweli"}, cost:50, money:-50, points:20, verdict:"good",
+      later:{en:"Later that week",sw:"Baadaye wiki hiyo"},
+      result:{en:"You still contributed and kept enough to get through the week safely. Most harambees welcome any amount.",sw:"Bado ulichangia na ukabaki na cha kutosha kupitia wiki salama. Harambee nyingi hukubali kiasi chochote."},
+      lesson:{en:"You control the number. Giving something honest is respected far more than giving everything and struggling after.",sw:"Wewe ndiye unaamua kiasi. Kutoa kwa uaminifu kunaheshimika zaidi kuliko kutoa yote kisha kuhangaika baadaye."}},
+     {main:{en:"Give nothing, explain you can't",sw:"Usitoe, eleza huwezi"}, sub:{en:"Keep your safety net intact",sw:"Hifadhi kinga yako"}, cost:0, money:0, points:5, verdict:"neutral",
+      later:{en:"Later that week",sw:"Baadaye wiki hiyo"},
+      result:{en:"It felt awkward, but no one held it against you for long. Your own safety net stayed intact.",sw:"Ilikuwa ngumu kidogo, lakini hakuna aliyekushikilia kwa muda mrefu. Kinga yako ilibaki salama."},
+      lesson:{en:"Saying no to a request you truly cannot afford is not shameful — it's necessary.",sw:"Kukataa ombi usiloweza kweli si aibu — ni lazima."}}
+   ]},
+
+ { id:"feesplan", order:60, type:"choice",
+   eyebrow:{en:"School fees",sw:"Ada ya shule"},
+   title:{en:"School fees of 3,600 KSh are due when next term starts — 10 weeks away.",sw:"Ada ya shule ya KSh 3,600 inahitajika muhula ujao unapoanza — wiki 10 kutoka sasa."},
+   text:{en:"In one lump it feels impossible. How do you prepare?",sw:"Kwa mkupuo mmoja inaonekana haiwezekani. Utajiandaaje?"},
+   options:[
+     {main:{en:"Save ~360 a week for 10 weeks",sw:"Weka akiba ~360 kwa wiki kwa wiki 10"}, sub:{en:"3,600 ÷ 10 weeks",sw:"3,600 ÷ wiki 10"}, cost:360, savings:360, points:25, verdict:"good",
+      later:{en:"When fees are due",sw:"Ada inapohitajika"},
+      result:{en:"By week 10, the fees were sitting ready. No scramble, no borrowing.",sw:"Kufikia wiki ya 10, ada ilikuwa tayari. Hakuna kuhangaika, hakuna kukopa."},
+      lesson:{en:"Split a lump sum by the weeks you have, and it stops being scary.",sw:"Gawanya kiasi kikubwa kwa wiki ulizonazo, nacho kinaacha kutisha."}},
+     {main:{en:"Wait and find the money in week 10",sw:"Subiri na utafute pesa wiki ya 10"}, sub:{en:"Deal with it when it's due",sw:"Shughulikia inapohitajika"}, cost:0, money:0, points:0, verdict:"bad",
+      later:{en:"Week 10",sw:"Wiki ya 10"},
+      result:{en:"You had to borrow most of it fast, at a cost you hadn't planned for.",sw:"Ulilazimika kukopa sehemu kubwa haraka, kwa gharama usiyoipanga."},
+      lesson:{en:"Known costs with known dates are the easiest to prepare for — waiting turns them into emergencies.",sw:"Gharama zinazojulikana na tarehe zinazojulikana ndizo rahisi kujiandaa — kusubiri kunazigeuza kuwa dharura."}}
+   ]}
+];
+
+/* ---------- State & helpers ---------- */
+let LANG = "en";
+let state = { screen:"start", i:0, money:START_MONEY, savings:0, points:0, hadDebt:false, name:"", deck:[] };
+const KSh = n => (n<0?"-":"")+"KSh "+Math.abs(Math.round(n)).toLocaleString("en-KE");
+const app = document.getElementById("app");
+function t(v){ return (v && typeof v==="object" && ("en" in v)) ? (v[LANG]!=null?v[LANG]:v.en) : v; }
+function ui(k){ return (L[LANG][k]!=null?L[LANG][k]:L.en[k]); }
+function fmt(s,o){ return String(s).replace(/\{(\w+)\}/g,(_,k)=> (o[k]!=null?o[k]:"")); }
+
+function loadBest(){ try{ return parseInt(localStorage.getItem("pesa_akiba_best")||"0",10)||0; }catch(e){ return 0; } }
+function saveBest(v){ try{ localStorage.setItem("pesa_akiba_best",String(v)); }catch(e){} }
+function loadLang(){ try{ const v=localStorage.getItem("pesa_lang"); if(v==="en"||v==="sw") LANG=v; }catch(e){} }
+function saveLang(){ try{ localStorage.setItem("pesa_lang",LANG); }catch(e){} }
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildDeck(){
+  const anchors = POOL.filter(s=>s.anchor);
+  const rest = shuffle(POOL.filter(s=>!s.anchor)).slice(0, ROUNDS - anchors.length);
+  return anchors.concat(rest).sort((a,b)=>a.order-b.order);
+}
+
+function bindLang(){
+  const b=document.getElementById("lang");
+  if(b) b.onclick=()=>{ LANG = LANG==="en"?"sw":"en"; saveLang(); repaint(); };
+}
+function langLabel(){ return LANG==="en" ? "KISWAHILI" : "ENGLISH"; }
+function repaint(){
+  if(state.screen==="start") startScreen();
+  else if(state.screen==="end") endScreen();
+  else render();
+}
+
+/* ---------- Screens ---------- */
+function startScreen(){
+  state.screen="start";
+  const best=loadBest();
+  app.innerHTML = `
+    <div class="startbar"><button id="lang" class="langbtn light">${langLabel()}</button></div>
+    <div class="stage center">
+      <h1 class="logo">Pesa <span>Poa</span></h1>
+      <div class="module">AKIBA · SAVINGS</div>
+      <p class="tagline">${ui("tagline")}</p>
+      <input class="namebox" id="name" placeholder="${ui("namePh")}" maxlength="20" autocomplete="off">
+      <button class="btn" id="go">${ui("start")}</button>
+      ${best?`<p class="foot">${ui("best")} <b>${best}</b></p>`:""}
+      <p class="foot">${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</p>
+    </div>`;
+  bindLang();
+  document.getElementById("go").onclick=()=>{
+    state={ screen:"play", i:0, money:START_MONEY, savings:0, points:0, hadDebt:false,
+            name:(document.getElementById("name").value||"").trim(), deck:buildDeck() };
+    render(); window.scrollTo(0,0);
+  };
+}
+
+function hud(){
+  const debt=state.money<0;
+  return `
+  <div class="hud">
+    <div class="hud-top">
+      <span class="hud-brand">Pesa <b>Poa</b></span>
+      <button id="lang" class="langbtn">${langLabel()}</button>
+    </div>
+    <div class="hud-stats">
+      <div class="hud-item ${debt?"debt":""}"><div class="hud-label">${debt?ui("hudDebt"):ui("hudMoney")}</div><div class="hud-val">${KSh(state.money)}</div></div>
+      <div class="hud-item"><div class="hud-label">${ui("hudSaved")}</div><div class="hud-val">${KSh(state.savings)}</div></div>
+      <div class="hud-item"><div class="hud-label">${ui("hudPts")}</div><div class="hud-val">${state.points}</div></div>
+    </div>
+    <div class="progress"><div class="progress-fill" style="width:${(state.i/state.deck.length)*100}%"></div></div>
+  </div>`;
+}
+
+function render(){
+  state.screen="play";
+  if(state.i>=state.deck.length) return endScreen();
+  const s=state.deck[state.i];
+  app.innerHTML = hud() + `<div class="stage" id="stage"></div>`;
+  bindLang();
+  const stage=document.getElementById("stage");
+  if(s.type==="choice") renderChoice(stage,s);
+  else if(s.type==="reveal") renderReveal(stage,s);
+  else if(s.type==="slider") renderSlider(stage,s);
+}
+
+function costTag(o){
+  if(o.cost>0) return `<span class="opt-cost spend">−${o.cost.toLocaleString()}</span>`;
+  if(o.money>0) return `<span class="opt-cost earn">+${o.money.toLocaleString()}</span>`;
+  return `<span class="opt-cost free">${ui("free")}</span>`;
+}
+function renderChoice(stage,s){
+  stage.innerHTML = `
+    <p class="eyebrow">${t(s.eyebrow)}</p>
+    <div class="scene">
+      <h2>${t(s.title)}</h2><p>${t(s.text)}</p>
+      <div class="options">
+        ${s.options.map((o,i)=>`<button class="opt" data-i="${i}">
+          <span><span class="opt-main">${t(o.main)}</span><br><span class="opt-sub">${t(o.sub)}</span></span>
+          ${costTag(o)}</button>`).join("")}
+      </div>
+    </div>`;
+  stage.querySelectorAll(".opt").forEach(b=> b.onclick=()=>choose(s, s.options[+b.dataset.i]));
+}
+function choose(s,o){
+  if(o.money) state.money += o.money;
+  if(o.savings){ state.savings += o.savings; if(o.savings>0) state.money -= o.savings; }
+  if(o.debt || state.money<0) state.hadDebt=true;
+  state.points += (o.points||0);
+  const tags=[];
+  if(o.money<0) tags.push(`<span class="tag spend">${KSh(o.money)}</span>`);
+  if(o.money>0) tags.push(`<span class="tag earn">+${KSh(o.money)}</span>`);
+  if(o.savings>0) tags.push(`<span class="tag save">${fmt(ui("tagSaved"),{m:KSh(o.savings)})}</span>`);
+  if(o.savings<0) tags.push(`<span class="tag spend">${fmt(ui("tagUsed"),{m:KSh(Math.abs(o.savings))})}</span>`);
+  if(o.points) tags.push(`<span class="tag pts">${fmt(ui("tagAkili"),{p:o.points})}</span>`);
+  showFeedback(s, o.verdict, t(o.later), t(o.result), t(o.lesson), tags);
+}
+
+function renderReveal(stage,s){
+  stage.innerHTML = `
+    <p class="eyebrow">${t(s.eyebrow)}</p>
+    <div class="scene">
+      <h2>${t(s.title)}</h2><p>${t(s.text)}</p>
+      <div class="options">
+        ${s.guesses.map((g,i)=>`<button class="opt" data-i="${i}"><span class="opt-main">${fmt(ui("guessLabel"),{n:g.toLocaleString()})}</span></button>`).join("")}
+      </div>
+    </div>`;
+  stage.querySelectorAll(".opt").forEach(b=> b.onclick=()=>revealProfit(s,+b.dataset.i));
+}
+function revealProfit(s,idx){
+  const right = idx===s.correctIndex;
+  state.money += s.moneyOnRun;
+  const pts = right ? s.points : Math.round(s.points*0.4);
+  state.points += pts;
+  const rows = s.breakdown.map(r=>`<div class="money-line"><span>${t(r.label)}</span><span style="color:${r.val<0?'var(--coral)':'var(--green-deep)'};font-weight:700">${KSh(r.val)}</span></div>`).join("");
+  const intro = `<p>${right?ui("revealYouSaw"):ui("revealMost")} ${ui("revealIntro")}</p>${rows}
+                 <div class="money-line"><span>${ui("realProfit")}</span><span style="color:var(--teal-deep)">${KSh(s.realProfit)}</span></div>`;
+  const tags = [`<span class="tag earn">${fmt(ui("tagProfit"),{m:KSh(s.realProfit)})}</span>`,`<span class="tag pts">${fmt(ui("tagAkili"),{p:pts})}</span>`];
+  const head = right ? fmt(ui("revealRight"),{p:KSh(s.realProfit)}) : ui("revealWrong");
+  showFeedback(s, right?"good":"neutral", ui("revealLater"), intro, t(s.lesson), tags, head);
+}
+
+function renderSlider(stage,s){
+  stage.innerHTML = `
+    <p class="eyebrow">${t(s.eyebrow)}</p>
+    <div class="scene">
+      <h2>${t(s.title)}</h2><p>${t(s.text)}</p>
+      <div class="tool">
+        <div class="tool-row"><span style="font-weight:700">${ui("perDay")}</span><span class="tool-big" id="pd"></span></div>
+        <input type="range" id="rng" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.start}">
+        <div class="grid3">
+          <div class="stat"><div class="n" id="w"></div><div class="l">${ui("inWeek")}</div></div>
+          <div class="stat"><div class="n" id="m"></div><div class="l">${ui("inMonth")}</div></div>
+          <div class="stat"><div class="n" id="y"></div><div class="l">${ui("inYear")}</div></div>
+        </div>
+      </div>
+      <button class="btn" id="next">${ui("sliderBtn")}</button>
+    </div>`;
+  const rng=document.getElementById("rng");
+  const upd=()=>{ const d=+rng.value;
+    document.getElementById("pd").textContent="KSh "+d;
+    document.getElementById("w").textContent=(d*7).toLocaleString();
+    document.getElementById("m").textContent=(d*30).toLocaleString();
+    document.getElementById("y").textContent=(d*365).toLocaleString();
+  };
+  rng.oninput=upd; upd();
+  document.getElementById("next").onclick=()=>{
+    const d=+rng.value; state.points+=s.points;
+    const tags=[`<span class="tag pts">${fmt(ui("tagAkili"),{p:s.points})}</span>`];
+    showFeedback(s,"good",ui("sliderLater"), fmt(ui("sliderBody"),{d:d,y:KSh(d*365)}), t(s.lesson), tags, ui("sliderHead"));
+  };
+}
+
+function showFeedback(s, verdict, laterLabel, resultHTML, lesson, tags, headOverride){
+  render_stat_only();
+  const head = headOverride || (verdict==="good"?ui("vGood"):verdict==="bad"?ui("vBad"):ui("vNeutral"));
+  const last = state.i+1>=state.deck.length;
+  app.querySelector(".stage").innerHTML = `
+    <p class="eyebrow">${t(s.eyebrow)}</p>
+    <div class="feedback">
+      <div class="verdict ${verdict}">
+        <h3>${head}</h3>
+        <div class="later">${laterLabel}</div>
+        <p>${resultHTML}</p>
+        <div class="lesson">💡 <span><b>${ui("lesson")}</b> ${lesson}</span></div>
+        <div class="delta-tags">${tags.join("")}</div>
+      </div>
+      <button class="btn" id="next">${last?ui("seeResults"):ui("next")}</button>
+    </div>`;
+  document.getElementById("next").onclick=()=>{ state.i++; render(); window.scrollTo(0,0); };
+}
+function render_stat_only(){
+  const hudEl = app.querySelector(".hud");
+  if(hudEl) hudEl.outerHTML = hud();
+  bindLang();
+}
+
+function endScreen(){
+  state.screen="end";
+  const total=state.points;
+  const best=Math.max(loadBest(),total); saveBest(best);
+  let badge,msg;
+  if(state.hadDebt||state.money<0){ badge=ui("badgeDebt"); msg=ui("msgDebt"); }
+  else if(total>=150){ badge=ui("badgePro"); msg=ui("msgPro"); }
+  else if(total>=105){ badge=ui("badgeSaver"); msg=ui("msgSaver"); }
+  else { badge=ui("badgeGrow"); msg=ui("msgGrow"); }
+  const scoreLabel = state.name ? fmt(ui("scoreNamed"),{name:state.name}) : ui("scoreUnnamed");
+  app.innerHTML = `
+    <div class="startbar"><button id="lang" class="langbtn light">${langLabel()}</button></div>
+    <div class="stage center">
+      <p class="eyebrow">${ui("endEyebrow")}</p>
+      <p style="margin:0;color:var(--ink-soft)">${scoreLabel}</p>
+      <div class="end-score">${total}</div>
+      <div class="badge">${badge}</div>
+      <p class="tagline" style="margin-top:0">${msg}</p>
+      <div class="recap">
+        <div class="money-line"><span>${ui("moneyLeft")}</span><span style="color:${state.money<0?'var(--coral)':'var(--green-deep)'};font-weight:800">${KSh(state.money)}</span></div>
+        <div class="money-line"><span>${ui("savedUp")}</span><span style="color:var(--teal);font-weight:800">${KSh(state.savings)}</span></div>
+        <div class="money-line"><span>${ui("totalWorth")}</span><span>${KSh(state.money+state.savings)}</span></div>
+      </div>
+      <div class="recap">
+        <h4>${ui("remember")}</h4>
+        <ul style="margin:0;padding-left:18px">
+          <li>${ui("r1")}</li><li>${ui("r2")}</li><li>${ui("r3")}</li>
+        </ul>
+      </div>
+      <button class="btn" id="again">${ui("playAgain")}</button>
+      <button class="btn ghost" id="home">${ui("backStart")}</button>
+      <p class="foot">${ui("best")} <b>${best}</b></p>
+    </div>`;
+  bindLang();
+  document.getElementById("again").onclick=()=>{
+    state={ screen:"play", i:0, money:START_MONEY, savings:0, points:0, hadDebt:false, name:state.name, deck:buildDeck() };
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("home").onclick=startScreen;
+}
+
+/* boot */
+loadLang();
+startScreen();
+</script>
+</body>
+</html>
