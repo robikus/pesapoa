@@ -2,9 +2,192 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Test Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pesa Poa — Money Smarts</title>
+<meta name="description" content="Free, offline money games for Kenyan secondary students. Budget, save, borrow and start a business — one real decision at a time.">
+<style>
+  :root{
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#16261C; --ink-soft:#4C5A50; --line:#E7DECB;
+    --green:#0E9E5B; --green-deep:#0A6F41; --green-tint:#E4F6EC;
+    --coral:#E24A33; --coral-tint:#FBE6E1; --yellow:#FFC22E; --teal:#0E7C86;
+    --shadow:0 6px 0 rgba(20,38,28,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);-webkit-text-size-adjust:100%;line-height:1.45}
+  .wrap{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+
+  .hud{position:sticky;top:0;z-index:10;background:var(--green-deep);color:#fff;padding:10px 12px;box-shadow:0 3px 10px rgba(0,0,0,.18);display:flex;justify-content:space-between;align-items:center}
+  .hud-brand{font-weight:900;letter-spacing:.01em;font-size:15px}
+  .hud-brand span{color:var(--yellow)}
+  .langbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;font:inherit;font-weight:800;font-size:11px;letter-spacing:.04em;padding:5px 11px;cursor:pointer}
+  .langbtn:active{transform:translateY(1px)}
+
+  .stage{flex:1;padding:18px 16px 28px;display:flex;flex-direction:column}
+
+  .hero{text-align:center;padding:26px 4px 8px}
+  .logo{font-size:42px;font-weight:900;letter-spacing:-.02em;color:var(--green-deep);margin:0}
+  .logo span{color:var(--yellow);-webkit-text-stroke:1px var(--green-deep)}
+  .tagline{color:var(--ink-soft);font-size:16px;margin:8px 0 0}
+
+  .lede{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-top:22px}
+  .lede p{margin:0;font-size:15.5px;color:var(--ink-soft)}
+  .lede p+p{margin-top:10px}
+  .lede b{color:var(--ink)}
+
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px}
+
+  .games{display:flex;flex-direction:column;gap:12px}
+  .game{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:15px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start}
+  .dot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:none}
+  .dot.c-green{background:var(--green)}
+  .dot.c-coral{background:var(--coral)}
+  .dot.c-teal{background:var(--teal)}
+  .dot.c-yellow{background:var(--yellow)}
+  .game-body{flex:1}
+  .game h3{margin:0 0 4px;font-size:17px}
+  .game p{margin:0;font-size:14px;color:var(--ink-soft)}
+  .game-cta{margin-top:10px;display:flex;align-items:center;gap:10px}
+  .game.disabled{opacity:.6}
+  .tag-soon{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft);padding:4px 9px;border-radius:999px}
+  .play{display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:var(--green);color:#fff;text-decoration:none;border:none;border-radius:12px;padding:9px 14px;font:inherit;font-weight:800;font-size:14px;box-shadow:0 4px 0 var(--green-deep);transition:transform .08s ease}
+  .play:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-deep)}
+
+  .support{margin-top:26px;background:var(--green-tint);border:2px solid var(--green);border-radius:18px;padding:20px}
+  .support h3{margin:0 0 8px;font-size:19px;color:var(--green-deep)}
+  .support p{margin:0;font-size:15px;color:var(--ink)}
+  .btn{display:block;width:100%;margin-top:16px;cursor:pointer;background:var(--green);color:#fff;text-decoration:none;text-align:center;border:none;border-radius:14px;padding:15px;font:inherit;font-weight:800;font-size:16px;box-shadow:0 5px 0 var(--green-deep);transition:transform .08s ease}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-deep)}
+
+  .foot{text-align:center;font-size:12px;color:var(--ink-soft);padding:22px 14px 6px}
+</style>
 </head>
 <body>
-<h1>hi dan, jak se mas?</h1>
+<div class="wrap" id="app"></div>
+
+<script>
+const L = {
+ en:{
+  brand:"Pesa <span>Poa</span>", langBtn:"KISWAHILI",
+  tagline:"Money games built on real Kenyan choices.",
+  lede1:"<b>Pesa Poa</b> (\"money is cool\" in Kiswahili) is a set of free games that put you inside real money decisions — a market stall, a boda fare, a cousin asking to borrow, a bill that shows up once a year.",
+  lede2:"Every round is short. Every choice has a consequence you can see. No internet needed, nothing to install, no data leaves the device — just play, on a phone or a shared school computer.",
+  gamesHead:"Choose a game",
+  g1t:"Household Budget", g1d:"Manage a month of real income and expenses, and see exactly where the money goes.",
+  g2t:"Loans &amp; Borrowing", g2d:"When borrowing helps, when it traps you, and how interest actually works.",
+  g3t:"Savings", g3d:"Small amounts, saved often, add up to real money — and real options later.",
+  g4t:"Starting a Business", g4d:"Turn a small idea into a stall that makes real profit, after every cost.",
+  play:"Play", soon:"Coming soon",
+  supportH:"Enjoyed the games?", 
+  supportP:"Pesa Poa is built for two schools on Lake Victoria — Wasamo Secondary Girls School on Mfangano Island, and Centre of Hope on Rusinga Island. If these games were useful to you, a small gift to the school goes a long way.",
+  supportBtn:"Support the school →",
+  foot:"Free. Offline. No ads, no data collected."
+ },
+ sw:{
+  brand:"Pesa <span>Poa</span>", langBtn:"ENGLISH",
+  tagline:"Michezo ya pesa iliyojengwa juu ya maamuzi halisi ya Kikenya.",
+  lede1:"<b>Pesa Poa</b> ni mfululizo wa michezo ya bure inayokuweka ndani ya maamuzi halisi ya pesa — kibanda sokoni, nauli ya boda, binamu anayeomba mkopo, bili inayotokea mara moja kwa mwaka.",
+  lede2:"Kila raundi ni fupi. Kila chaguo lina matokeo unayoyaona. Hauhitaji intaneti, hakuna cha kusakinisha, hakuna data inayotoka kwenye kifaa — cheza tu, kwenye simu au kompyuta ya shule.",
+  gamesHead:"Chagua Mchezo",
+  g1t:"Bajeti ya Nyumbani", g1d:"Simamia mapato na matumizi ya mwezi mzima, na uone hasa pesa zinakoenda.",
+  g2t:"Mikopo na Kukopa", g2d:"Wakati kukopa kunasaidia, wakati kunanasa, na jinsi riba inavyofanya kazi kweli.",
+  g3t:"Akiba", g3d:"Kiasi kidogo, kikiwekwa mara kwa mara, kinakuwa pesa halisi — na chaguo halisi baadaye.",
+  g4t:"Kuanzisha Biashara", g4d:"Geuza wazo dogo kuwa kibanda kinachopata faida halisi, baada ya kila gharama.",
+  play:"Cheza", soon:"Inakuja hivi karibuni",
+  supportH:"Umefurahia michezo?",
+  supportP:"Pesa Poa imejengwa kwa ajili ya shule mbili karibu na Ziwa Victoria — Wasamo Secondary Girls School kisiwa cha Mfangano, na Centre of Hope kisiwa cha Rusinga. Ikiwa michezo hii imekusaidia, zawadi ndogo kwa shule ina maana kubwa.",
+  supportBtn:"Saidia Shule →",
+  foot:"Bure. Bila intaneti. Hakuna matangazo, hakuna data inayokusanywa."
+ }
+};
+
+let LANG = "en";
+function loadLang(){ try{ const v=localStorage.getItem("pesa_lang"); if(v==="en"||v==="sw") LANG=v; }catch(e){} }
+function saveLang(){ try{ localStorage.setItem("pesa_lang",LANG); }catch(e){} }
+function t(k){ return L[LANG][k]; }
+
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="hud">
+      <div class="hud-brand">${t("brand")}</div>
+      <button id="lang" class="langbtn">${t("langBtn")}</button>
+    </div>
+    <div class="stage">
+
+      <div class="hero">
+        <p class="logo">${t("brand")}</p>
+        <p class="tagline">${t("tagline")}</p>
+      </div>
+
+      <div class="lede">
+        <p>${t("lede1")}</p>
+        <p>${t("lede2")}</p>
+      </div>
+
+      <p class="eyebrow">${t("gamesHead")}</p>
+      <div class="games">
+
+        <div class="game">
+          <span class="dot c-green"></span>
+          <div class="game-body">
+            <h3>${t("g1t")}</h3>
+            <p>${t("g1d")}</p>
+            <div class="game-cta">
+              <a class="play" href="apps/budget.html">${t("play")} →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="game disabled">
+          <span class="dot c-coral"></span>
+          <div class="game-body">
+            <h3>${t("g2t")}</h3>
+            <p>${t("g2d")}</p>
+            <div class="game-cta"><span class="tag-soon">${t("soon")}</span></div>
+          </div>
+        </div>
+
+        <div class="game">
+          <span class="dot c-teal"></span>
+          <div class="game-body">
+            <h3>${t("g3t")}</h3>
+            <p>${t("g3d")}</p>
+            <div class="game-cta">
+              <a class="play" href="apps/savings.html">${t("play")} →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="game disabled">
+          <span class="dot c-yellow"></span>
+          <div class="game-body">
+            <h3>${t("g4t")}</h3>
+            <p>${t("g4d")}</p>
+            <div class="game-cta"><span class="tag-soon">${t("soon")}</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="support">
+        <h3>${t("supportH")}</h3>
+        <p>${t("supportP")}</p>
+        <a class="btn" href="https://mfanganogirls.org" target="_blank" rel="noopener">${t("supportBtn")}</a>
+      </div>
+
+      <p class="foot">${t("foot")}</p>
+    </div>
+  `;
+  document.getElementById("lang").onclick = () => {
+    LANG = LANG === "en" ? "sw" : "en";
+    saveLang();
+    render();
+  };
+}
+
+loadLang();
+render();
+</script>
 </body>
 </html>
