@@ -73,7 +73,7 @@ const L = {
   lede1:"<b>Pesa Poa</b> (\"money is cool\" in Kiswahili) is a set of free games that put you inside real money decisions — a market stall, a boda fare, a cousin asking to borrow, a bill that shows up once a year.",
   lede2:"Every round is short. Every choice has a consequence you can see. No internet needed, nothing to install, no data leaves the device — just play, on a phone or a shared school computer.",
   gamesHead:"Choose a game",
-  g1t:"Household Budget", g1d:"Manage a month of real income and expenses, and see exactly where the money goes.",
+  g1t:"Money Basics", g1d:"Manage a month of real income and expenses, and see exactly where the money goes.",
   g2t:"Loans &amp; Borrowing", g2d:"When borrowing helps, when it traps you, and how interest actually works.",
   g3t:"Savings", g3d:"Small amounts, saved often, add up to real money — and real options later.",
   g4t:"Starting a Business", g4d:"Turn a small idea into a stall that makes real profit, after every cost.",
@@ -89,7 +89,7 @@ const L = {
   lede1:"<b>Pesa Poa</b> ni mfululizo wa michezo ya bure inayokuweka ndani ya maamuzi halisi ya pesa — kibanda sokoni, nauli ya boda, binamu anayeomba mkopo, bili inayotokea mara moja kwa mwaka.",
   lede2:"Kila raundi ni fupi. Kila chaguo lina matokeo unayoyaona. Hauhitaji intaneti, hakuna cha kusakinisha, hakuna data inayotoka kwenye kifaa — cheza tu, kwenye simu au kompyuta ya shule.",
   gamesHead:"Chagua Mchezo",
-  g1t:"Bajeti ya Nyumbani", g1d:"Simamia mapato na matumizi ya mwezi mzima, na uone hasa pesa zinakoenda.",
+  g1t:"Misingi ya Pesa", g1d:"Simamia mapato na matumizi ya mwezi mzima, na uone hasa pesa zinakoenda.",
   g2t:"Mikopo na Kukopa", g2d:"Wakati kukopa kunasaidia, wakati kunanasa, na jinsi riba inavyofanya kazi kweli.",
   g3t:"Akiba", g3d:"Kiasi kidogo, kikiwekwa mara kwa mara, kinakuwa pesa halisi — na chaguo halisi baadaye.",
   g4t:"Kuanzisha Biashara", g4d:"Geuza wazo dogo kuwa kibanda kinachopata faida halisi, baada ya kila gharama.",
@@ -139,15 +139,6 @@ function render(){
           </div>
         </div>
 
-        <div class="game disabled">
-          <span class="dot c-coral"></span>
-          <div class="game-body">
-            <h3>${t("g2t")}</h3>
-            <p>${t("g2d")}</p>
-            <div class="game-cta"><span class="tag-soon">${t("soon")}</span></div>
-          </div>
-        </div>
-
         <div class="game">
           <span class="dot c-teal"></span>
           <div class="game-body">
@@ -156,6 +147,15 @@ function render(){
             <div class="game-cta">
               <a class="play" href="apps/savings.html">${t("play")} →</a>
             </div>
+          </div>
+        </div>
+
+        <div class="game disabled">
+          <span class="dot c-coral"></span>
+          <div class="game-body">
+            <h3>${t("g2t")}</h3>
+            <p>${t("g2d")}</p>
+            <div class="game-cta"><span class="tag-soon">${t("soon")}</span></div>
           </div>
         </div>
 
