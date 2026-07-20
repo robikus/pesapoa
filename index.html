@@ -19,8 +19,9 @@
   .wrap{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
 
   .hud{position:sticky;top:0;z-index:10;background:var(--green-deep);color:#fff;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;justify-content:space-between;align-items:center}
-  .hud-brand{font-weight:900;letter-spacing:.01em;font-size:15px}
+  .hud-brand{display:flex;align-items:center;gap:6px;font-weight:900;letter-spacing:.01em;font-size:15px;color:#fff;text-decoration:none}
   .hud-brand span{color:var(--yellow)}
+  .hud-logo{width:22px;height:22px;display:block}
   .langbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;font:inherit;font-weight:700;font-size:11px;letter-spacing:.04em;padding:5px 11px;cursor:pointer;transition:background .15s ease}
   .langbtn:hover{background:rgba(255,255,255,.22)}
 
@@ -111,7 +112,7 @@ function render(){
   const app = document.getElementById("app");
   app.innerHTML = `
     <div class="hud">
-      <div class="hud-brand">${t("brand")}</div>
+      <a class="hud-brand" href="index.html"><img class="hud-logo" src="logo/sunset_trans_mini_2.png" alt="">${t("brand")}</a>
       <button id="lang" class="langbtn">${t("langBtn")}</button>
     </div>
     <div class="stage">
