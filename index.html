@@ -71,7 +71,7 @@
 const L = {
  en:{
   brand:"Pesa <span>Poa</span>", langBtn:"KISWAHILI",
-  tagline:"Money games built on real Kenyan choices.",
+  tagline:"Simple games to teach you finance better.",
   lede1:"<b>Pesa Poa</b> (\"money is cool\" in Kiswahili) is a set of free games that put you inside real money decisions — a market stall, a boda fare, a cousin asking to borrow, a bill that shows up once a year.",
   lede2:"Every round is short. Every choice has a consequence you can see. No internet needed, nothing to install, no data leaves the device — just play, on a phone or a shared school computer.",
   gamesHead:"Choose a game",
@@ -87,7 +87,7 @@ const L = {
  },
  sw:{
   brand:"Pesa <span>Poa</span>", langBtn:"ENGLISH",
-  tagline:"Michezo ya pesa iliyojengwa juu ya maamuzi halisi ya Kikenya.",
+  tagline:"Michezo rahisi ya kukufundisha pesa vizuri zaidi.",
   lede1:"<b>Pesa Poa</b> ni mfululizo wa michezo ya bure inayokuweka ndani ya maamuzi halisi ya pesa — kibanda sokoni, nauli ya boda, binamu anayeomba mkopo, bili inayotokea mara moja kwa mwaka.",
   lede2:"Kila raundi ni fupi. Kila chaguo lina matokeo unayoyaona. Hauhitaji intaneti, hakuna cha kusakinisha, hakuna data inayotoka kwenye kifaa — cheza tu, kwenye simu au kompyuta ya shule.",
   gamesHead:"Chagua Mchezo",
@@ -120,11 +120,6 @@ function render(){
       <div class="hero">
         <p class="logo">${t("brand")}</p>
         <p class="tagline">${t("tagline")}</p>
-      </div>
-
-      <div class="lede">
-        <p>${t("lede1")}</p>
-        <p>${t("lede2")}</p>
       </div>
 
       <p class="eyebrow">${t("gamesHead")}</p>
@@ -170,6 +165,11 @@ function render(){
           </div>
         </div>
 
+      </div>
+
+      <div class="lede">
+        <p>${t("lede1")}</p>
+        <p>${t("lede2")}</p>
       </div>
 
       <div class="support">
