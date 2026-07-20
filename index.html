@@ -28,8 +28,6 @@
   .stage{flex:1;padding:18px 16px 28px;display:flex;flex-direction:column}
 
   .hero{text-align:center;padding:26px 4px 8px}
-  .logo{font-size:42px;font-weight:800;letter-spacing:-.02em;color:var(--green-deep);margin:0}
-  .logo span{color:var(--yellow)}
   .tagline{color:var(--ink-soft);font-size:16px;margin:8px 0 0}
 
   .lede{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-top:22px}
@@ -40,7 +38,7 @@
   .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px}
 
   .games{display:flex;flex-direction:column;gap:12px}
-  .game{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start}
+  .game{background:var(--green-tint);border:1px solid var(--line);border-radius:var(--r);padding:15px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start}
   .dot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:none}
   .dot.c-green{background:var(--green)}
   .dot.c-coral{background:var(--coral)}
@@ -50,7 +48,7 @@
   .game h3{margin:0 0 4px;font-size:17px;font-weight:700}
   .game p{margin:0;font-size:14px;color:var(--ink-soft)}
   .game-cta{margin-top:10px;display:flex;align-items:center;gap:10px}
-  .game.disabled{opacity:.6}
+  .game.disabled{background:var(--card);opacity:.6}
   .tag-soon{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft);padding:4px 9px;border-radius:999px}
   .play{display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:var(--green);color:#fff;text-decoration:none;border:none;border-radius:var(--rs);padding:9px 14px;font:inherit;font-weight:700;font-size:14px;transition:background .15s ease,transform .15s ease}
   .play:hover{background:var(--green-deep);transform:translateY(-1px)}
@@ -74,7 +72,6 @@ const L = {
   tagline:"Simple games to teach you finance better.",
   lede1:"<b>Pesa Poa</b> (\"money is cool\" in Kiswahili) is a set of free games that put you inside real money decisions — a market stall, a boda fare, a cousin asking to borrow, a bill that shows up once a year.",
   lede2:"Every round is short. Every choice has a consequence you can see. No internet needed, nothing to install, no data leaves the device — just play, on a phone or a shared school computer.",
-  gamesHead:"Choose a game",
   g1t:"Money Basics", g1d:"Manage a month of real income and expenses, and see exactly where the money goes.",
   g2t:"Loans &amp; Borrowing", g2d:"When borrowing helps, when it traps you, and how interest actually works.",
   g3t:"Savings", g3d:"Small amounts, saved often, add up to real money — and real options later.",
@@ -90,7 +87,6 @@ const L = {
   tagline:"Michezo rahisi ya kukufundisha pesa vizuri zaidi.",
   lede1:"<b>Pesa Poa</b> ni mfululizo wa michezo ya bure inayokuweka ndani ya maamuzi halisi ya pesa — kibanda sokoni, nauli ya boda, binamu anayeomba mkopo, bili inayotokea mara moja kwa mwaka.",
   lede2:"Kila raundi ni fupi. Kila chaguo lina matokeo unayoyaona. Hauhitaji intaneti, hakuna cha kusakinisha, hakuna data inayotoka kwenye kifaa — cheza tu, kwenye simu au kompyuta ya shule.",
-  gamesHead:"Chagua Mchezo",
   g1t:"Misingi ya Pesa", g1d:"Simamia mapato na matumizi ya mwezi mzima, na uone hasa pesa zinakoenda.",
   g2t:"Mikopo na Kukopa", g2d:"Wakati kukopa kunasaidia, wakati kunanasa, na jinsi riba inavyofanya kazi kweli.",
   g3t:"Akiba", g3d:"Kiasi kidogo, kikiwekwa mara kwa mara, kinakuwa pesa halisi — na chaguo halisi baadaye.",
@@ -118,11 +114,9 @@ function render(){
     <div class="stage">
 
       <div class="hero">
-        <p class="logo">${t("brand")}</p>
         <p class="tagline">${t("tagline")}</p>
       </div>
 
-      <p class="eyebrow">${t("gamesHead")}</p>
       <div class="games">
 
         <div class="game">
