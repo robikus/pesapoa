@@ -85,6 +85,8 @@
   .center{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px 8px}
   .startbar{display:flex;justify-content:flex-end;padding:10px 12px 0}
   .tagline{color:var(--ink-soft);font-size:16px;margin:6px 0 22px}
+  .back-btn{display:inline-block;color:var(--ink-soft);font:inherit;font-weight:700;font-size:13px;text-decoration:none;margin:0 0 18px}
+  .back-btn:hover{color:var(--green-deep)}
   .start-logo{width:48px;height:48px;display:block;margin:0 auto 12px}
   .game-title{font-size:28px;font-weight:800;letter-spacing:-.01em;color:var(--green-deep);margin:0 0 16px}
   .brief{text-align:left;width:100%;margin:0 0 22px;padding:20px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
@@ -411,6 +413,7 @@ function startScreen(){
   const best=loadBest();
   app.innerHTML = `
     <div class="stage center">
+      <a class="back-btn" href="../index.html">← Back</a>
       <img class="start-logo" src="../logo/sunset_trans_mini_2.png" alt="">
       <h1 class="game-title">${ui("gameTitle")}</h1>
       <ul class="brief">
