@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/household", "destination": "/apps/household.html" },
+    { "source": "/savings", "destination": "/apps/savings.html" }
+  ]
+}
