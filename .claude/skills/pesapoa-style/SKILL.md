@@ -1,6 +1,6 @@
 ---
 name: pesapoa-style
-description: Use whenever creating or editing an HTML page in this project (index.html, apps/*.html) so it matches the existing Pesa Poa look — same CSS variables, logo, fonts, cards, buttons, and component patterns. Load before writing any new page or component.
+description: Use whenever creating or editing an HTML page in this project (index.html, household.html, savings.html) so it matches the existing Pesa Poa look — same CSS variables, logo, fonts, cards, buttons, and component patterns. Load before writing any new page or component.
 ---
 
 # Pesa Poa visual style
@@ -10,14 +10,26 @@ Single source of truth for the look of every page in this project. Copy the
 radii, or shadow values. This is a mobile-first, offline, bilingual (en/sw)
 site for Kenyan secondary students. The visual language is calm and clean —
 white cards on a light grey page, flat buttons with a subtle hover-lift,
-Arial throughout, a forest-green + gold brand palette — with two bolder
-gradient accents reserved for specific moments (see Support section below
-and the in-game HUD colors), not used everywhere.
+Arial throughout, a forest-green + gold brand palette — with one bolder
+gradient accent reserved for a specific moment (the homepage Support
+section), not used everywhere.
 
-**Important:** `index.html` (the homepage) and `apps/*.html` (the games)
-intentionally use two different header patterns — a flat, non-sticky
-"hero" on the homepage vs. a colored sticky HUD inside games. Both are
-documented separately below; don't merge them.
+**File layout:** all three pages sit flat at the repo root —
+`index.html`, `household.html`, `savings.html` — plus `logo/` for the
+shared logo image and `vercel.json` (`{"cleanUrls": true}`, so
+`household.html`/`savings.html` are reachable as `/household`/`/savings`
+with no `.html` and no subfolder). There is **no `apps/` folder anymore** —
+the games used to live there but were moved to root so clean URLs work
+without needing Vercel `rewrites` (those were tried first and silently
+didn't apply for this project — cleanUrls + flat file layout is the
+solution that actually works). Because everything is flat, every internal
+reference is a same-level path: `logo/sunset_trans_mini_2.png` and
+`index.html`, never `../something`.
+
+**Important:** `index.html` (the homepage) and `household.html` /
+`savings.html` (the games) intentionally use two different header
+patterns — a flat, non-sticky "hero" on the homepage vs. a colored sticky
+HUD inside games. Both are documented separately below; don't merge them.
 
 ## Core tokens (put this exact block in every page's `<style>`)
 
@@ -25,7 +37,7 @@ documented separately below; don't merge them.
 :root{
   --paper:#F8F9FA; --card:#FEFEFE; --ink:#343A40; --ink-soft:#6C757D; --line:#E9ECEF;
   --green:#40916C; --green-deep:#1E4D35; --green-tint:#D8F3DC;
-  --coral:#E63946; --coral-tint:#FEE2E2; --yellow:#E9C46A; --teal:#1E40AF;
+  --coral:#E63946; --coral-tint:#FEE2E2; --yellow:#E9C46A; --teal:#C2410C;
   --shadow:0 2px 12px rgba(0,0,0,.08);
   --r:14px; --rs:8px;
 }
@@ -43,14 +55,22 @@ body{font-family:Arial,sans-serif;background:var(--paper);color:var(--ink);-webk
 - `--green` / `--green-deep` — primary brand action color; `-deep` is for in-game HUD backgrounds, gradients, and darker headings
 - `--green-tint` — soft success/positive/stat-tile background fill, and the default game-icon tint
 - `--coral` / `--coral-tint` — negative/spend/warning
-- `--teal` — Mitumba-derived info-blue (`#1E40AF`), not a green-family teal. Used for eyebrows/accents, and as the entire chrome color of `apps/savings.html` (HUD, logo, buttons) so Savings keeps a visually distinct identity from Household's green theme.
-- `--yellow` — a muted gold (`#E9C46A`) — logo's "Poa", badges, points, and the Support button's hover color
+- `--teal` — a **dark orange** (`#C2410C`), despite the name. It was blue
+  earlier, then Mitumba-derived blue, and is now dark orange — the name
+  stuck through both changes purely to avoid a site-wide rename. It's used
+  for eyebrows/accents, the homepage "Poa" logo accent, and as the entire
+  chrome color of `savings.html` (HUD, logo, buttons) so Savings keeps a
+  visually distinct identity from Household's green theme. Keep
+  `index.html`'s `--teal` value identical to `savings.html`'s, since
+  `index.html`'s `.gicon.c-teal`/`.game.c-teal` preview Savings' color on
+  the homepage.
+- `--yellow` — a muted gold (`#E9C46A`) — badges, points, and the Support button's hover color
 - `--r` — card/box border-radius (14px)
 - `--rs` — button/input border-radius (8px)
 
-`apps/savings.html` additionally defines `--teal-deep:#1E3A8A` for its HUD
-background and biggest numbers/logo, parallel to how `--green-deep` relates
-to `--green`.
+`savings.html` additionally defines `--teal-deep:#9A3412` (a darker orange)
+for its HUD background and biggest numbers/logo, parallel to how
+`--green-deep` relates to `--green`.
 
 ## Typography
 
@@ -65,8 +85,8 @@ to `--green`.
 ## Logo asset
 
 `logo/sunset_trans_mini_2.png` — a small circular transparent-background
-icon (acacia tree at sunset). Reference it as `logo/...` from `index.html`
-and `../logo/...` from anything under `apps/`.
+icon (acacia tree at sunset). Reference it as plain `logo/...` from any
+page — everything lives flat at the repo root, so there's never a `../`.
 
 ## Homepage hero (`index.html` only)
 
@@ -80,7 +100,7 @@ page-colored hero block that scrolls away with the rest of the content:
 .hero-logo-ring{width:84px;height:84px;margin:0 auto 14px;background:var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
 .hero-logo{width:62px;height:62px;display:block}
 .logo{font-size:32px;font-weight:800;letter-spacing:-.02em;color:var(--green-deep);margin:0}
-.logo span{color:var(--yellow)}
+.logo span{color:var(--teal)}
 .tagline{color:var(--ink-soft);font-size:16px;margin:10px auto 0;max-width:320px}
 ```
 ```html
@@ -96,14 +116,17 @@ Notes:
   separate top bar.
 - The logo sits inside a plain light-grey circle (`var(--line)` fill) with a
   soft drop shadow — **not** a colored gradient banner, and **not** white
-  (a white circle disappears against the near-white page). This was tried
-  as a full green gradient banner with decorative blur shapes and small
-  "Free / Offline / EN·SW" feature pills; both were explicitly removed in
-  favor of this flatter look — don't reintroduce them without being asked.
+  (a white circle disappears against the near-white page). A full green
+  gradient banner with decorative blur shapes and small "Free / Offline /
+  EN·SW" feature pills was tried and explicitly removed in favor of this
+  flatter look — don't reintroduce them without being asked.
 - Homepage brand text is **"Pesa Poa Games"** (en) / **"Pesa Poa Michezo"**
   (sw) — note the suffix. This differs from the in-game HUD, which just
-  says "Pesa Poa". Current tagline: "Free games to manage your finance
-  better." (`heroTagline` role, key `tagline` in `L`).
+  says "Pesa Poa". The "Poa" span is dark orange (`var(--teal)`), not gold.
+- Current tagline (key `tagline` in `L`): "Learn to manage your finance
+  better." / "Jifunze kudhibiti pesa yako vizuri zaidi." — grey
+  (`var(--ink-soft)`), not colored. Earlier drafts said "Free games to
+  manage..." and tried orange text; both were reverted.
 - There is no "Choose a game" eyebrow above the game list anymore — the
   hero is immediately followed by `.games`.
 
@@ -124,11 +147,11 @@ inner "Play" link); disabled/"coming soon" games stay as plain non-link
 .game.disabled{border-left-color:var(--line);opacity:.65}
 .gicon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none;background:var(--green-tint)}
 .gicon.c-coral{background:var(--coral-tint)}
-.gicon.c-teal{background:#DBEAFE}
+.gicon.c-teal{background:#FFEDD5}
 .gicon.c-yellow{background:#FEF3C7}
 ```
 ```html
-<a class="game" href="apps/household.html">
+<a class="game" href="/household">
   <span class="gicon">💰</span>
   <div class="game-body">
     <h3>${t("g1t")}</h3>
@@ -137,9 +160,13 @@ inner "Play" link); disabled/"coming soon" games stay as plain non-link
   </div>
 </a>
 ```
+- Links use the **clean paths** `/household` and `/savings` (not
+  `household.html` or an `apps/` prefix) so the URL bar stays tidy.
 - Each game gets one color role (default green, or `.c-teal`/`.c-coral`/
   `.c-yellow`), applied to **both** the card (`border-left`) and its
-  `.gicon` (tint background) — keep the pair in sync.
+  `.gicon` (tint background) — keep the pair in sync. `.c-teal`'s tint is
+  now a light orange (`#FFEDD5`), matching `--teal`'s dark-orange value,
+  not blue.
 - One emoji per game icon, no combinations: 💰 Money Basics, 🏦 Savings, 🤝
   Loans & Borrowing, 🏪 Starting a Business.
 - `.play` inside an active card is a plain styled `<span>`, not a nested
@@ -153,12 +180,15 @@ inner "Play" link); disabled/"coming soon" games stay as plain non-link
 ```css
 .card-like{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
 ```
-Used as `.lede`, `.scene`, `.recap`, `.stat`, `.verdict` etc. — always
-`border-radius:var(--r)` (14px), a thin 1px border, and the soft ordinary
-`var(--shadow)` drop shadow (no offset "pressed" shadow anywhere).
+Used as `.lede`, `.scene`, `.recap`, `.stat`, `.verdict`, `.brief` (the
+game-start bullet box, see below) etc. — always `border-radius:var(--r)`
+(14px), a thin 1px border, and the soft ordinary `var(--shadow)` drop
+shadow (no offset "pressed" shadow anywhere).
 
 On the homepage, the `.lede` info box ("Pesa Poa... is a set of free
-games...") sits **below** the games list, not above it.
+games...") sits **below** the games list, not above it, and has no
+box/border of its own — it's plain text directly on the page background
+(the boxed-card version was tried and reverted).
 
 ## Support / donation section
 
@@ -188,12 +218,13 @@ Pill-shaped, pastel background + darker matching text:
 ```css
 .tag.spend{background:#FEE2E2;color:#991B1B}
 .tag.earn{background:#D8F3DC;color:#1E4D35}
-.tag.save{background:#DBEAFE;color:#1E40AF}
+.tag.save{background:#FFEDD5;color:#C2410C}
 .tag.pts{background:#FEF3C7;color:#92400E}
 ```
-These four pastel pairs are the only badge colors in the system.
+These four pastel pairs are the only badge colors in the system. `.tag.save`
+is a light-orange pair (matching `--teal`'s dark orange), not blue.
 
-## In-game HUD (`apps/household.html`, `apps/savings.html`)
+## In-game HUD (`household.html`, `savings.html`)
 
 Unlike the homepage, each game keeps a **sticky, colored, two-row HUD**:
 
@@ -208,7 +239,7 @@ Unlike the homepage, each game keeps a **sticky, colored, two-row HUD**:
 ```html
 <div class="hud">
   <div class="hud-top">
-    <a class="hud-brand" href="../index.html"><img class="hud-logo" src="../logo/sunset_trans_mini_2.png" alt="">Pesa <b>Poa</b></a>
+    <a class="hud-brand" href="index.html"><img class="hud-logo" src="logo/sunset_trans_mini_2.png" alt="">Pesa <b>Poa</b></a>
     <button id="lang" class="langbtn">${langLabel()}</button>
   </div>
   <div class="hud-stats">...</div>
@@ -218,27 +249,69 @@ Unlike the homepage, each game keeps a **sticky, colored, two-row HUD**:
 - `.hud-brand` here says plain **"Pesa Poa"** (no "Games"/"Michezo" suffix —
   that's homepage-only branding).
 - Clicking the brand (logo + wordmark) **always navigates back to
-  `../index.html`**, from any game screen — this is a real `<a>`, not a JS
+  `index.html`**, from any game screen — this is a real `<a>`, not a JS
   handler, so it works from every screen the HUD appears on.
 - `.hud-top` (brand + language button) has a visible thin divider
   (`border-bottom`) separating it from the `.hud-stats` row below —
   don't remove this divider, it was added deliberately to separate identity
   chrome from live game data.
-- Household's HUD is green (`--green-deep`); Savings' HUD is blue
+- Household's HUD is green (`--green-deep`); Savings' HUD is dark orange
   (`--teal-deep`) for its distinct module identity — see the `--teal`
   color-role note above.
-- The large centered `.logo` on each game's start/end screen (plain text
-  wordmark, no image, no link) is unaffected by any of this — it's a
-  separate hero-style element specific to those two screens.
 
-### No name-entry step
+## Game start screen
 
-Games used to open with an optional "type your name" input before Start.
-This was removed entirely — do not reintroduce it:
-- No `.namebox` input, no `state.name` field.
-- End screen shows a single, unconditional score line via one `score`
-  translation key (e.g. "Your Akili score") — there is no more
-  named/unnamed variant (`scoreNamed`/`scoreUnnamed` no longer exist).
+Both games open on a start screen with this exact stack (all inside
+`.stage.center`), before the language toggle/HUD ever appears:
+
+```css
+.back-btn{display:inline-block;color:var(--ink-soft);font:inherit;font-weight:700;font-size:13px;text-decoration:none;margin:0 0 18px}
+.back-btn:hover{color:var(--green-deep)} /* or var(--teal-deep) on savings.html */
+.start-logo{width:48px;height:48px;display:block;margin:0 auto 12px}
+.game-title{font-size:28px;font-weight:800;letter-spacing:-.01em;color:var(--green-deep);margin:0 0 16px} /* var(--teal-deep) on savings.html */
+.brief{text-align:left;width:100%;margin:0 0 22px;padding:20px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.brief li{position:relative;padding-left:20px;margin-bottom:10px;color:var(--ink-soft);font-size:15px}
+.brief li:last-child{margin-bottom:0}
+.brief li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--green)} /* var(--teal) on savings.html */
+.brief li b{color:var(--ink)}
+```
+```html
+<div class="stage center">
+  <a class="back-btn" href="index.html">← Back</a>
+  <img class="start-logo" src="logo/sunset_trans_mini_2.png" alt="">
+  <h1 class="game-title">${ui("gameTitle")}</h1>
+  <ul class="brief">
+    <li>${ui("briefDesc")}</li>
+    <li>${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</li>
+    <li>${ui("briefGoal")}</li>
+    ${best?`<li>${ui("best")} <b>${best}</b></li>`:""}
+  </ul>
+  <button class="btn" id="go">${ui("start")}</button>
+</div>
+```
+Key points — this layout went through several iterations, so don't
+reintroduce earlier versions:
+- **No lang-toggle button, no tagline, and no big text-only "Pesa Poa"
+  logo** on the start screen — all were explicitly deleted. The only
+  branding here is the small `.start-logo` image plus the game title.
+- **"← Back" is plain text**, not a button/pill — no background, no
+  border. It always links to `index.html` (the homepage), from either
+  game.
+- **`gameTitle`** is a per-game, per-language string that always ends with
+  the word "Game" in English ("Money Basics Game", "Savings Game") / a
+  "Mchezo wa ..." construction in Swahili ("Mchezo wa Misingi ya Pesa",
+  "Mchezo wa Akiba").
+- The bullet list (`.brief`) always has exactly this content, in this
+  order: (1) a one-line description, (2) the starting-money line reusing
+  the existing `startMoney` string, (3) the goal, (4) the best score on
+  this device — only shown if `best > 0`. It's a real card (bordered,
+  shadowed, full width matching the button below it), not plain text.
+- The old "type your name" input (`.namebox`, `state.name`,
+  `scoreNamed`/`scoreUnnamed`) was removed entirely earlier and must not
+  come back — the end screen shows one unconditional `score` string.
+- The Start button always reads "Start the game →" / "Anza mchezo →"
+  (key `start`), not a per-game verb like "Start the month" or "Start
+  saving".
 
 ## Motion
 
@@ -269,11 +342,13 @@ function called on load, keeping all copy centralized in `L`.
 
 1. Start from the `:root` token block above, unchanged.
 2. Decide up front: is this the homepage (flat hero pattern) or a game
-   (sticky colored HUD pattern)? Don't mix the two.
+   (sticky colored HUD + start-screen pattern)? Don't mix the two.
 3. Reuse existing class names/patterns instead of inventing new ones when
    one already fits.
 4. Keep everything inline in one `<style>` + one `<script>` per `.html`
-   file — no external CSS/JS/font files (must work fully offline).
+   file, flat at the repo root — no external CSS/JS/font files, no `apps/`
+   subfolder, no `../` paths (must work fully offline; clean URLs depend on
+   the flat layout).
 5. New copy must be added to both `en` and `sw` in `L` — never hardcode
    English strings in the template.
 6. Max width stays 560px; mobile-first single column.
@@ -281,6 +356,10 @@ function called on load, keeping all copy centralized in `L`.
 8. Font stays Arial only; radii come from `--r`/`--rs`; tags use the four
    pastel pairs; game-card color roles stay in sync between the card's
    `border-left` and its `.gicon` tint.
-9. Don't add a name-entry step, and don't add a colored gradient banner or
-   feature-pill row to the homepage hero — both were tried and explicitly
-   removed.
+9. Don't add a name-entry step, a lang toggle or tagline on the game start
+   screen, or a colored gradient banner/feature-pill row to the homepage
+   hero — all were tried and explicitly removed.
+10. If a new top-level page needs a clean URL (no `.html`), just add the
+    file at the repo root — `vercel.json`'s `cleanUrls: true` handles the
+    rest automatically. Don't add custom `rewrites`; they didn't work
+    reliably for this project.
