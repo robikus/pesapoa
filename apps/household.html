@@ -84,9 +84,12 @@
 
   .center{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px 8px}
   .startbar{display:flex;justify-content:flex-end;padding:10px 12px 0}
-  .logo{font-size:40px;font-weight:800;letter-spacing:-.02em;color:var(--green-deep);margin:0}
-  .logo span{color:var(--yellow)}
   .tagline{color:var(--ink-soft);font-size:16px;margin:6px 0 22px}
+  .brief{text-align:left;width:100%;margin:0 0 22px;padding:20px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .brief li{position:relative;padding-left:20px;margin-bottom:10px;color:var(--ink-soft);font-size:15px}
+  .brief li:last-child{margin-bottom:0}
+  .brief li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .brief li b{color:var(--ink)}
   .end-score{font-size:56px;font-weight:700;color:var(--green-deep);line-height:1;margin:4px 0;font-variant-numeric:tabular-nums}
   .badge{display:inline-block;background:var(--yellow);color:#92400E;font-weight:700;padding:8px 16px;border-radius:999px;margin-bottom:14px}
   .recap{text-align:left;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-top:14px}
@@ -120,8 +123,9 @@ const ROUNDS = 9;
 /* ---------- UI strings ---------- */
 const L = {
  en:{
-  tagline:"A game about money you actually use.<br>Make choices. See what happens. Get smarter.",
-  start:"Start the month →",
+  start:"Start the game →",
+  briefDesc:"A quick game about real money choices — one month, real income and expenses.",
+  briefGoal:"Get to the end of the month without debt, and grow your Akili score.",
   best:"Best score on this device:", startMoney:"You start with {m} for the whole month.",
   hudMoney:"Money", hudDebt:"In debt", hudSaved:"Saved", hudPts:"Akili pts",
   free:"Free", next:"Next →", seeResults:"See my results →",
@@ -145,8 +149,9 @@ const L = {
   badgeGrow:"Getting there 🌱", msgGrow:"A steady month. Look for the cheaper, planned choice each time and your score will climb."
  },
  sw:{
-  tagline:"Mchezo kuhusu pesa unazotumia kweli.<br>Fanya maamuzi. Ona kinachotokea. Kuwa na akili zaidi.",
-  start:"Anza mwezi →",
+  start:"Anza mchezo →",
+  briefDesc:"Mchezo mfupi kuhusu maamuzi halisi ya pesa — mwezi mmoja, mapato na matumizi halisi.",
+  briefGoal:"Fika mwisho wa mwezi bila deni, na uongeze alama yako ya Akili.",
   best:"Alama bora kwenye kifaa hiki:", startMoney:"Unaanza na {m} kwa mwezi mzima.",
   hudMoney:"Pesa", hudDebt:"Una deni", hudSaved:"Akiba", hudPts:"Akili",
   free:"Bure", next:"Endelea →", seeResults:"Ona matokeo →",
@@ -401,15 +406,15 @@ function startScreen(){
   state.screen="start";
   const best=loadBest();
   app.innerHTML = `
-    <div class="startbar"><button id="lang" class="langbtn light">${langLabel()}</button></div>
     <div class="stage center">
-      <h1 class="logo">Pesa <span>Poa</span></h1>
-      <p class="tagline">${ui("tagline")}</p>
+      <ul class="brief">
+        <li>${ui("briefDesc")}</li>
+        <li>${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</li>
+        <li>${ui("briefGoal")}</li>
+        ${best?`<li>${ui("best")} <b>${best}</b></li>`:""}
+      </ul>
       <button class="btn" id="go">${ui("start")}</button>
-      ${best?`<p class="foot">${ui("best")} <b>${best}</b></p>`:""}
-      <p class="foot">${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</p>
     </div>`;
-  bindLang();
   document.getElementById("go").onclick=()=>{
     state={ screen:"play", i:0, money:START_MONEY, savings:0, points:0, hadDebt:false, deck:buildDeck() };
     render(); window.scrollTo(0,0);

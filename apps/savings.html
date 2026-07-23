@@ -84,10 +84,12 @@
 
   .center{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px 8px}
   .startbar{display:flex;justify-content:flex-end;padding:10px 12px 0}
-  .logo{font-size:40px;font-weight:800;letter-spacing:-.02em;color:var(--teal-deep);margin:0}
-  .logo span{color:var(--yellow)}
-  .module{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--teal);padding:4px 12px;border-radius:999px;margin:10px 0 0}
   .tagline{color:var(--ink-soft);font-size:16px;margin:10px 0 22px}
+  .brief{text-align:left;width:100%;margin:0 0 22px;padding:20px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .brief li{position:relative;padding-left:20px;margin-bottom:10px;color:var(--ink-soft);font-size:15px}
+  .brief li:last-child{margin-bottom:0}
+  .brief li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--teal)}
+  .brief li b{color:var(--ink)}
   .end-score{font-size:56px;font-weight:700;color:var(--teal-deep);line-height:1;margin:4px 0;font-variant-numeric:tabular-nums}
   .badge{display:inline-block;background:var(--yellow);color:#92400E;font-weight:700;padding:8px 16px;border-radius:999px;margin-bottom:14px}
   .recap{text-align:left;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-top:14px}
@@ -122,8 +124,9 @@ const ROUNDS = 9;
 /* ---------- UI strings ---------- */
 const L = {
  en:{
-  tagline:"A game about building a buffer.<br>Small choices. Real safety net. See what sticks.",
-  start:"Start saving →",
+  start:"Start the game →",
+  briefDesc:"A quick game about building a real savings buffer — small choices, real safety net.",
+  briefGoal:"Protect your buffer and grow it — without going into debt.",
   best:"Best score on this device:", startMoney:"You start with {m} for the month, plus a savings goal in mind.",
   hudMoney:"Money", hudDebt:"In debt", hudSaved:"Saved", hudPts:"Akili pts",
   free:"Free", next:"Next →", seeResults:"See my results →",
@@ -147,8 +150,9 @@ const L = {
   badgeGrow:"Building the habit 🌱", msgGrow:"A steady month. Look for the choice that protects your buffer each time and your score will climb."
  },
  sw:{
-  tagline:"Mchezo kuhusu kujenga akiba.<br>Maamuzi madogo. Kinga halisi. Ona kinachobaki.",
-  start:"Anza kuweka akiba →",
+  start:"Anza mchezo →",
+  briefDesc:"Mchezo mfupi kuhusu kujenga akiba halisi — maamuzi madogo, kinga halisi.",
+  briefGoal:"Linda akiba yako na uikuze — bila kuingia deni.",
   best:"Alama bora kwenye kifaa hiki:", startMoney:"Unaanza na {m} kwa mwezi, ukiwa na lengo la akiba akilini.",
   hudMoney:"Pesa", hudDebt:"Una deni", hudSaved:"Akiba", hudPts:"Akili",
   free:"Bure", next:"Endelea →", seeResults:"Ona matokeo →",
@@ -404,16 +408,15 @@ function startScreen(){
   state.screen="start";
   const best=loadBest();
   app.innerHTML = `
-    <div class="startbar"><button id="lang" class="langbtn light">${langLabel()}</button></div>
     <div class="stage center">
-      <h1 class="logo">Pesa <span>Poa</span></h1>
-      <div class="module">AKIBA · SAVINGS</div>
-      <p class="tagline">${ui("tagline")}</p>
+      <ul class="brief">
+        <li>${ui("briefDesc")}</li>
+        <li>${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</li>
+        <li>${ui("briefGoal")}</li>
+        ${best?`<li>${ui("best")} <b>${best}</b></li>`:""}
+      </ul>
       <button class="btn" id="go">${ui("start")}</button>
-      ${best?`<p class="foot">${ui("best")} <b>${best}</b></p>`:""}
-      <p class="foot">${fmt(ui("startMoney"),{m:KSh(START_MONEY)})}</p>
     </div>`;
-  bindLang();
   document.getElementById("go").onclick=()=>{
     state={ screen:"play", i:0, money:START_MONEY, savings:0, points:0, hadDebt:false, deck:buildDeck() };
     render(); window.scrollTo(0,0);
